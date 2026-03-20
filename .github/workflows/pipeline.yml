@@ -6,27 +6,47 @@ on:
     workflow_dispatch:
 
 jobs:
-  deploy:
-    name: deploy
+  build:
     runs-on: ubuntu-latest
+    env:
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Setup Node.js and cache
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: "22"
-          cache: "npm"
-      - name: Install firebase-tools
-        run: npm install --save-dev firebase-tools
-      - name: Run build
-        run: npm run build
-        env:
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
-      - name: Deploy to Firebase Hosting
+          node-version: 22
+      - run: npm install
+      # - run: npm test
+      - run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: dist
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: dist
+      - run: npm install --save-dev firebase-tools
+      - name: Decode Firebase service account key
         run: |
-          ./node_modules/.bin/firebase deploy --project "${{ secrets.FIREBASE_PROJECT_ID }}"
+          echo "${{ secrets.FIREBASE_KEY }}" | base64 -d > ./firebase-key.json
+          echo "GOOGLE_APPLICATION_CREDENTIALS=${{ github.workspace }}/firebase-key.json" >> $GITHUB_ENV
+      - name: Change Firebase project
+        run: ./node_modules/.bin/firebase use ${{ secrets.FIREBASE_PROJECT_ID }}
+      - name: Deploy to Firebase Hosting
+        run: ./node_modules/.bin/firebase deploy
         env:
-          FIREBASE_KEY: ${{ secrets.FIREBASE_KEY }}
           FIREBASE_CLI_EXPERIMENTS: webframeworks
+      - name: Delete firebase-key.json
+        run: rm "${{ github.workspace }}/firebase-key.json"
+        if: ${{ always() }}
