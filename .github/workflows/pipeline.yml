@@ -6,8 +6,8 @@ on:
     workflow_dispatch:
 
 jobs:
-  test:
-    name: test
+  deploy:
+    name: deploy
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -17,10 +17,16 @@ jobs:
         with:
           node-version: "22"
           cache: "npm"
-      - name: Install dependencies
-        run: npm install
-      - name: Run Test
-        run: npm run test
+      - name: Install firebase-tools
+        run: npm install --save-dev firebase-tools
+      - name: Run build
+        run: npm run build
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+      - name: Deploy to Firebase Hosting
+        run: |
+          ./node_modules/.bin/firebase deploy --project "${{ secrets.FIREBASE_PROJECT_ID }}"
+        env:
+          FIREBASE_KEY: ${{ secrets.FIREBASE_KEY }}
+          FIREBASE_CLI_EXPERIMENTS: webframeworks
