@@ -3,21 +3,24 @@ name: Study Record App CI/CD Pipeline
 on:
   push:
     branches: [main]
-  workflow_dispatch:  # 手動実行を有効化
+    workflow_dispatch:
 
 jobs:
-  build_and_deploy:
+  test:
+    name: test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - run: npm ci && npm run build
-        # 以下を追加
-        env:
-          VITE_SUPABASE_URL: ${{secrets.VITE_SUPABASE_URL}}
-          VITE_SUPABASE_ANON_KEY: ${{secrets.VITE_SUPABASE_ANON_KEY}}
-      - uses: FirebaseExtended/action-hosting-deploy@v0
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Node.js and cache
+        uses: actions/setup-node@v4
         with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_PROJECT_ID }}
-          channelId: live
-          projectId: study-record-app-jisou
+          node-version: "22"
+          cache: "npm"
+      - name: Install dependencies
+        run: npm install
+      - name: Run Test
+        run: npm run test
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
