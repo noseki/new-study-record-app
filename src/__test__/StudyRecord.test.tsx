@@ -12,7 +12,7 @@ describe("学習記録アプリ", () => {
         expect(await screen.findByRole("heading", { name: "学習記録一覧" })).toBeInTheDocument();
     });
 
-    test("フォームに学習内容と時間を入力して登録ボタンを押すと新たに記録が追加されていること", async () => {
+    test("フォームに学習内容と時間を入力して登録ボタンを押すと新たに記録が追加されている", async () => {
         render(<StudyRecord />);
 
         await waitForElementToBeRemoved(() => screen.getByText("Loading..."));
