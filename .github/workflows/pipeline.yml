@@ -25,6 +25,9 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Run tests
+        run: npm run test
+
       - name: Build application
         run: npm run build
 
@@ -62,12 +65,15 @@ jobs:
         run: |
           echo "${{ secrets.FIREBASE_KEY }}" | base64 -d > ./firebase-key.json
           echo "GOOGLE_APPLICATION_CREDENTIALS=${{ github.workspace }}/firebase-key.json" >> $GITHUB_ENV
+
       - name: Change Firebase project
         run: ./node_modules/.bin/firebase use ${{ secrets.FIREBASE_PROJECT_ID }}
+
       - name: Deploy to Firebase Hosting
         run: ./node_modules/.bin/firebase deploy
         env:
           FIREBASE_CLI_EXPERIMENTS: webframeworks
+
       - name: Delete firebase-key.json
         run: rm "${{ github.workspace }}/firebase-key.json"
         if: ${{ always() }}
