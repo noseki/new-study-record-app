@@ -77,7 +77,7 @@ export function StudyRecord() {
         <h1>学習記録一覧</h1>
         <InputRecord title={title} time={time} onChangeTitle={onChangeTitle} onChangeTime={onChangeTime} />
         <ShowRecords records={records} onClickDelete={onClickDelete}/>
-        <button onClick={onClickAdd}>登録する</button>
+        <button onClick={onClickAdd}>登録</button>
         <p style={{ color: 'red' }}>{error}</p>
         <p>合計時間：{totalTime} / 1000 (h)</p>
       </>
