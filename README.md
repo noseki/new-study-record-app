@@ -1,19 +1,65 @@
-# React + Vite
+# 学習記録アプリ
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+エンジニアとしての学習時間は1000時間が必要と言われており、
+日々勉強を頑張る方向けの学習内容と学習時間を記録できるWebアプリです。
 
-Currently, two official plugins are available:
+# 機能概要
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- 学習内容と学習時間を登録/削除できる
+- 登録した記録は一覧表示される
+- 学習時間の合計値が分かる
 
-## React Compiler
+# 技術スタック
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+- **フロントエンド**: React 19
+- **バックエンド**: Supabase
+- **ビルドツール**: Vite
+- **テスト**: Vitest, react-testing-library
+- **デプロイ**: Firebase Hosting
 
-Note: This will impact Vite dev & build performances.
+# 環境設定
 
-## Expanding the ESLint configuration
+### 1. リポジトリをクローン
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-# new-study-record-app
+```
+git clone https://github.com/noseki/new-study-record-app.git
+cd new-study-record-app
+```
+
+### 2. 依存関係のインストール
+
+前提：Node.jsがインストールされている必要があります
+
+```
+npm install
+```
+
+### 3. 環境変数の設定
+
+[Supabase](https://supabase.com)にてアカウントおよびプロジェクトを作成し、
+.envファイルをプロジェクトルート下に作成し、以下の内容を記載してください。
+
+```
+# SupabaseのプロジェクトID（「Project Settings」>「Data API」内　`API URL` ）
+VITE_SUPABASE_URL=https://XXXXXXXXXXXXXXX.supabase.co
+# SupabaseのAPI KEY（「Project Settings」>「API Keys」>「
+Legacy anon, service_role API keys」タブ内　`anon/public key` ）
+VITE_SUPABASE_ANON_KEY=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+```
+
+Supabaseのプロジェクト内で下記内容の`study-record`テーブルを用意してください。
+
+| カラム名 | 型 | 説明 |
+|----------|-----|------|
+| id | uuid | 主キー |
+| title | text | 学習内容 |
+| time | numeric | 学習時間（時間単位） |
+| created_at | timestamp | 作成日時 |
+
+4. 起動方法
+
+### 開発サーバーでの起動
+
+```bash
+npm run dev
+```
